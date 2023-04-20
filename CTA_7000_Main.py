@@ -1424,13 +1424,11 @@ class Ui_Main(object):
 #Red/Pink Label "background-color: #ffcccb;"
 
 # def main(carnum, inspStatus):
-class InspOverviewSignal(QObject):
-    insp_overview_requested = pyqtSignal(QApplication, str, str)
 class InspOverview():
-
-    def __init__(self):
-        self.signal = InspOverviewSignal()
-        self.signal.insp_overview_requested.connect(self.main)
+    #
+    # def __init__(self):
+    #     self.signal = InspOverviewSignal()
+    #     self.signal.insp_overview_requested.connect(self.main)
 
     def main(self, app, carNum, Insp):
 
@@ -1440,7 +1438,9 @@ class InspOverview():
         exr, er, rrn = [], [], []
         exrS, erS = [], []
         ppi = ""
-        con = sqlite3.connect(path)
+        print("Database path:", UpdateDatabase.path)
+
+        con = sqlite3.connect(UpdateDatabase.path)
         cur = con.cursor()
         '''get current rrn, exr, er, ppi status'''
 
@@ -1507,8 +1507,10 @@ class InspOverview():
             # print(erS)
             # print(exr)
             # print(exrS)
+            con.close()
         else:
             messagebox.showerror(message=f"Car_INSP_Point is not allocated yet.")
+            con.close()
             return False
 
         # app = QApplication([])
@@ -1631,7 +1633,6 @@ class InspOverview():
         # app.exec_()
         window.exec_()
 
-
 def main(carnum, SList):
     import sys
     '''grab the function by values'''
@@ -1650,8 +1651,12 @@ def main(carnum, SList):
              "PPR", "CUP", "CUR", "SCS", "DCS", "PSI", "DEL"]
 
     insp_overview = InspOverview()
-    for button, insp in zip(ui.cist, IList):
-        button.clicked.connect(partial(insp_overview.signal.insp_overview_requested.emit, app, ui.car_num, insp))
+    ui.cist[0].clicked.connect(lambda: insp_overview.main(app, ui.car_num, "2IW"))
+    ui.cist[1].clicked.connect(lambda: insp_overview.main(app, ui.car_num, "2IW"))
+
+
+    # for button, insp in zip(ui.cist, IList):
+    #     button.clicked.connect(partial(insp_overview.signal.insp_overview_requested.emit, app, ui.car_num, insp))
 
 
 
